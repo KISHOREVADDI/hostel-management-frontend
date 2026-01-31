@@ -1,0 +1,290 @@
+<div class="student-wrapper">
+    <!-- Sidebar -->
+    <div class="sidebar" [class.active]="isSidebarOpen">
+        <div class="logo">
+            <h2>GGU Student</h2>
+        </div>
+        <div class="profile-summary">
+            <img [src]="student?.profileImage || 'assets/default-avatar.png'" class="sidebar-avatar">
+            <h4>{{ student?.name }}</h4>
+            <p>{{ student?.collegePin }}</p>
+        </div>
+        <ul class="nav-links">
+            <li [class.active]="activeTab === 'profile'" (click)="activeTab = 'profile'; isSidebarOpen = false">
+                <span>👤</span> My Profile
+            </li>
+            <li [class.active]="activeTab === 'request'" (click)="activeTab = 'request'; isSidebarOpen = false">
+                <span>📝</span> New Request
+            </li>
+            <li [class.active]="activeTab === 'history'" (click)="activeTab = 'history'; isSidebarOpen = false">
+                <span>🕒</span> History
+            </li>
+            <li [class.active]="activeTab === 'complaints'" (click)="activeTab = 'complaints'; isSidebarOpen = false">
+                <span>💬</span> Complaints
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <button (click)="authService.logout()">🚪 Logout</button>
+        </div>
+    </div>
+
+    <!-- Overlay for mobile sidebar -->
+    <div class="sidebar-overlay" *ngIf="isSidebarOpen" (click)="isSidebarOpen = false"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Notification Toast -->
+        <div class="notification-toast" [class.show]="notification.show" [class.error]="notification.type === 'error'">
+            {{ notification.message }}
+        </div>
+
+        <header>
+            <div class="header-left">
+                <button class="menu-btn" (click)="toggleSidebar()">☰</button>
+                <h3>{{ activeTab | titlecase }}</h3>
+            </div>
+            <div class="header-actions">
+                <button class="qr-btn" (click)="showQR = true">
+                    📱 View My QR
+                </button>
+            </div>
+        </header>
+
+        <!-- Profile Tab -->
+        <div *ngIf="activeTab === 'profile' && student" class="content-panel fade-in">
+            <div class="profile-cover">
+                <div class="status-banner" [class]="student.status">
+                    CURRENT STATUS: {{ getFormattedStatus(student.status) }}
+                </div>
+            </div>
+            <div class="profile-details-grid">
+                <div class="detail-card">
+                    <label>Branch</label>
+                    <h3>{{ student.branch }}</h3>
+                </div>
+                <div class="detail-card">
+                    <label>Year</label>
+                    <h3>{{ student.currentYear }}</h3>
+                </div>
+                <div class="detail-card">
+                    <label>Department</label>
+                    <h3>{{ student.department }}</h3>
+                </div>
+                <div class="detail-card">
+                    <label>Gender</label>
+                    <h3>{{ student.gender }}</h3>
+                </div>
+                <div class="detail-card full">
+                    <label>Mobile</label>
+                    <h3>{{ student.parentMobileNumber }}</h3>
+                </div>
+                <div class="detail-card full">
+                    <label>Address</label>
+                    <h3>{{ student.village }}, {{ student.mandal }}, {{ student.district }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Request Tab -->
+        <div *ngIf="activeTab === 'request'" class="content-panel fade-in">
+            <div class="request-form-card">
+                <div class="card-header">
+                    <h2>Apply for Permission</h2>
+                    <span class="close-card-btn-student" (click)="activeTab = 'profile'">&times;</span>
+                </div>
+
+                <div class="card-body">
+                    <p style="margin-top: 0; color: #666; margin-bottom: 20px;">Submit a request for Outing or Home
+                        leave.</p>
+
+                    <div class="form-group">
+                        <label>Permission Type</label>
+                        <select [(ngModel)]="permission.type">
+                            <option value="OUTING">Outing (Return Same Day)</option>
+                            <option value="HOME">Go Home (Long Leave)</option>
+                            <option value="RETURN">Returning to Hostel</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Reason</label>
+                        <textarea [(ngModel)]="permission.reason" placeholder="Enter valid reason..."></textarea>
+                    </div>
+
+                    <!-- Proof Upload for Outing -->
+                    <div class="form-group" *ngIf="permission.type === 'OUTING'">
+                        <label>Permission Letter</label>
+                        <small style="display: block; color: #666; margin-bottom: 5px;">Upload letter with HOD/Class
+                            Teacher
+                            signature & College Stamp</small>
+                        <div class="file-upload-wrapper">
+                            <input type="file" (change)="onFileSelected($event)" accept="image/*">
+                        </div>
+                    </div>
+
+                    <button class="submit-btn" (click)="applyPermission()">Submit Request</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div *ngIf="activeTab === 'history'" class="content-panel fade-in">
+            <div class="history-list">
+                <div *ngFor="let h of history" class="history-card" [class]="h.status">
+                    <div class="card-left">
+                        <h4>{{ h.type }}</h4>
+                        <span>{{ h.requestDate | date:'mediumDate' }}</span>
+                    </div>
+                    <div class="card-center">
+                        <p>{{ h.reason }}</p>
+                        <!-- Instruction for Approved Return -->
+                        <div *ngIf="h.type === 'RETURN' && h.status === 'APPROVED'" class="return-instruction">
+                            ⚠️ Scan QR at Gate to complete Check-In
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <span class="status-pill">{{ h.status }}</span>
+                        <button *ngIf="h.status === 'APPROVED'" class="letter-btn-small" (click)="openLetter(h)">
+                            📄 Letter
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Complaints Tab (New Light Design) -->
+        <div *ngIf="activeTab === 'complaints'" class="content-panel fade-in">
+            <!-- Complaint Form -->
+            <div class="complaint-card light-theme">
+                <div class="cp-header">
+                    <h3>📢 Raise a Complaint</h3>
+                    <p>Facing an issue? Let us know.</p>
+                </div>
+
+                <div class="cp-body">
+                    <div class="alert-warning-box">
+                        ⚠️ Note: Please add Room No, Block, and Hostel ID with Proof (Photo).
+                        <strong>Any unwanted complaints will result in a fine being imposed.</strong>
+                    </div>
+
+                    <div class="form-row-light">
+                        <div class="form-group-light half">
+                            <label>Hostel ID</label>
+                            <input type="text" [(ngModel)]="newComplaint.hostelId"
+                                [placeholder]="student?.hostelId || 'Hostel ID'">
+                        </div>
+                        <div class="form-group-light half">
+                            <label>Block</label>
+                            <input type="text" [(ngModel)]="newComplaint.block" placeholder="Block (e.g. A)">
+                        </div>
+                    </div>
+
+                    <div class="form-group-light" style="margin-top: -15px;">
+                        <label>Room No</label>
+                        <input type="text" [(ngModel)]="newComplaint.roomNo" placeholder="Room Number">
+                    </div>
+
+                    <div class="form-group-light">
+                        <label>Category</label>
+                        <select [(ngModel)]="newComplaint.category">
+                            <option value="MAINTENANCE">🔧 Maintenance (Fan, Light, Water)</option>
+                            <option value="FOOD">🍛 Food Quality</option>
+                            <option value="CLEANING">🧹 Cleaning & Hygiene</option>
+                            <option value="OTHER">📝 Other Issue</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group-light">
+                        <label>Description</label>
+                        <textarea [(ngModel)]="newComplaint.description" placeholder="Describe the issue in detail..."
+                            rows="4"></textarea>
+                    </div>
+
+                    <div class="form-group-light">
+                        <label>Upload Proof (Photo)</label>
+                        <div class="file-upload-box">
+                            <input type="file" (change)="onProofSelected($event)" accept="image/*">
+                        </div>
+                    </div>
+
+                    <button class="btn-submit-light" (click)="submitComplaint()" [disabled]="isSubmittingComplaint">
+                        {{ isSubmittingComplaint ? 'Submitting...' : 'Submit Complaint' }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- My Complaints List -->
+            <div class="complaints-list-section">
+                <h3>My Complaints History</h3>
+
+                <div *ngIf="complaints.length === 0" class="empty-complaints">
+                    <p>No complaints raised yet.</p>
+                </div>
+
+                <div class="complaint-item" *ngFor="let c of complaints">
+                    <div class="ci-icon" [style.background]="getCompliaintStatusColor(c.status)">
+                        <span *ngIf="c.category === 'MAINTENANCE'">🔧</span>
+                        <span *ngIf="c.category === 'FOOD'">🍛</span>
+                        <span *ngIf="c.category === 'CLEANING'">🧹</span>
+                        <span *ngIf="c.category === 'OTHER'">📝</span>
+                    </div>
+                    <div class="ci-content">
+                        <div class="ci-top">
+                            <h4>{{ c.category }}</h4>
+                            <span class="ci-date">{{ c.submittedDate | date:'medium' }}</span>
+                        </div>
+                        <p class="ci-desc">{{ c.description }}</p>
+                        <div class="ci-status">
+                            Status: <span [style.color]="getCompliaintStatusColor(c.status)"
+                                style="font-weight: bold;">{{ c.status }}</span>
+                        </div>
+                        <div class="ci-remark" *ngIf="c.adminRemarks">
+                            <strong>Admin Reply:</strong> {{ c.adminRemarks }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Modal -->
+<div class="modal-overlay" *ngIf="showQR" (click)="showQR = false">
+    <div class="modal-content qr-modal" (click)="$event.stopPropagation()">
+        <span class="close-btn" (click)="showQR = false">&times;</span>
+        <h2>My GGU QuickPass</h2>
+        <div class="qr-container">
+            <img [src]="'data:image/png;base64,' + student?.qrCode" alt="QR Code">
+        </div>
+        <p class="pin-display">{{ student?.collegePin }}</p>
+        <button class="btn-download-qr" (click)="downloadQR()">⬇ Download QR</button>
+    </div>
+</div>
+
+<!-- Permission Letter Modal -->
+<div class="modal-overlay" *ngIf="selectedLetter" (click)="selectedLetter = null">
+    <div class="modal-content letter-modal" (click)="$event.stopPropagation()">
+        <span class="close-btn" (click)="selectedLetter = null">&times;</span>
+
+        <div class="letter-head">
+            <h2>GGU HOSTEL</h2>
+            <h3>PERMISSION LETTER</h3>
+        </div>
+
+        <div class="letter-body">
+            <p><strong>To:</strong> {{ student?.name }} ({{ student?.collegePin }})</p>
+            <p><strong>Date:</strong> {{ selectedLetter.requestDate | date:'mediumDate' }}</p>
+            <br>
+            <p>Your request for <strong>{{ selectedLetter.type }}</strong> has been <strong>APPROVED</strong>.</p>
+            <p><strong>Reason:</strong> {{ selectedLetter.reason }}</p>
+            <br>
+            <p style="color: green; font-weight: bold;">Access Granted: You are permitted to leave/enter the premises.
+            </p>
+        </div>
+
+        <div class="letter-footer">
+            <p>Authorized Signature</p>
+            <p><em>Hostel Warden</em></p>
+        </div>
+    </div>
+</div>

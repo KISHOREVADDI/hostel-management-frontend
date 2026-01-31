@@ -1,0 +1,43 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo-circle">
+        <span class="logo-text">GGUH</span>
+      </div>
+      <!-- Removed Title and Subtitle as requested -->
+    </div>
+
+    <div *ngIf="error" class="error-alert">
+      <span class="error-icon">⚠</span>
+      {{ error }}
+    </div>
+
+    <form (ngSubmit)="login()" class="login-form">
+      <div class="form-group">
+        <label for="username">User ID / College PIN</label>
+        <div class="input-container">
+          <input type="text" id="username" [(ngModel)]="credentials.username" name="username"
+            placeholder="Enter your ID" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-container">
+          <input type="password" id="password" [(ngModel)]="credentials.password" name="password"
+            placeholder="Enter your password" required>
+        </div>
+      </div>
+
+      <button type="submit" class="login-btn">
+        <span>Sign In</span>
+      </button>
+
+      <div class="footer-links">
+        <a href="#">Forgot Password?</a>
+        <span class="divider">•</span>
+        <a href="#">Help</a>
+      </div>
+    </form>
+  </div>
+</div>

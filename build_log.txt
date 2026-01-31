@@ -1,0 +1,84 @@
+﻿node.exe : - 
+Generating browser 
+application bundles 
+(phase: setup)...
+At C:\Users\yadal\App
+Data\Roaming\npm\ng.p
+s1:24 char:5
++     & "node$exe"  "
+$basedir/node_modules
+/@angular/cli/bin/ng.
+js" $arg ...
++     ~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (- Gener   
+ ating br...hase:    
+ setup)...:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+Γ£ö Browser 
+application bundle 
+generation complete.
+Γ£ö Browser 
+application bundle 
+generation complete.
+
+Warning: C:/Users/yad
+al/Desktop/vinayaka/f
+rontend/src/app/compo
+nents/admin/admin-das
+hboard/admin-dashboar
+d.component.css 
+exceeded maximum 
+budget. Budget 2.00 
+kB was not met by 
+2.73 kB with a total 
+of 4.73 kB.
+
+Warning: C:/Users/yad
+al/Desktop/vinayaka/f
+rontend/src/app/compo
+nents/student/student
+-dashboard/student-da
+shboard.component.css
+ exceeded maximum 
+budget. Budget 2.00 
+kB was not met by 
+2.16 kB with a total 
+of 4.16 kB.
+
+
+
+Error: C:/Users/yadal
+/Desktop/vinayaka/fro
+ntend/src/app/compone
+nts/admin/admin-dashb
+oard/admin-dashboard.
+component.css 
+exceeded maximum 
+budget. Budget 4.00 
+kB was not met by 
+751 bytes with a 
+total of 4.73 kB.
+
+Error: C:/Users/yadal
+/Desktop/vinayaka/fro
+ntend/src/app/compone
+nts/student/student-d
+ashboard/student-dash
+board.component.css 
+exceeded maximum 
+budget. Budget 4.00 
+kB was not met by 
+163 bytes with a 
+total of 4.16 kB.
+
+

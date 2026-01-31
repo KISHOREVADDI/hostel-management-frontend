@@ -1,0 +1,77 @@
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    pointer-events: none;
+    /* Let clicks pass through, but enable pointer-events on cards */
+}
+
+.toast-card {
+    pointer-events: auto;
+    min-width: 300px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    animation: slideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.toast-card:hover {
+    transform: translateY(-2px) scale(1.02);
+}
+
+.toast-card:active {
+    transform: scale(0.98);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Types */
+.toast-card.success {
+    border-left: 5px solid #2ecc71;
+}
+
+.toast-card.error {
+    border-left: 5px solid #e74c3c;
+}
+
+.toast-card.info {
+    border-left: 5px solid #3498db;
+}
+
+.toast-card.warning {
+    border-left: 5px solid #f1c40f;
+}
+
+/* Text */
+.toast-message {
+    color: #2c3e50;
+    font-weight: 500;
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.toast-icon {
+    font-size: 18px;
+}

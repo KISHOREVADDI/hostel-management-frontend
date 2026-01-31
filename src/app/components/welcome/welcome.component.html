@@ -1,0 +1,32 @@
+<div class="welcome-container">
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="logo">
+            <h1>GGU Hostel</h1>
+        </div>
+        <div class="nav-links">
+            <button class="nav-btn" (click)="scrollToHome()">Home</button>
+            <button class="login-btn navbar-btn" (click)="showLogin = true">Login</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="hero-content">
+            <h1>Welcome to GGU Hostel</h1>
+            <p>Secure. Smart. Seamless.</p>
+            <button class="cta-btn" (click)="showLogin = true">Get Started</button>
+        </div>
+    </div>
+</div>
+
+<!-- Login Modal -->
+<div class="modal-overlay" *ngIf="showLogin" (click)="showLogin = false">
+    <div class="modal-content login-modal" (click)="$event.stopPropagation()">
+        <span class="close-btn" (click)="showLogin = false">&times;</span>
+        <!-- Reuse Login Component Logic here OR embed app-login if adapted -->
+        <!-- Since app-login was a page, we might need to adapt it. 
+             For simplicity, we will assume app-login acts as the form container. -->
+        <app-login></app-login>
+    </div>
+</div>

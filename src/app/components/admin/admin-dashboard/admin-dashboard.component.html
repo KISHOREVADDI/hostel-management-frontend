@@ -1,0 +1,944 @@
+<div class="admin-wrapper">
+    <!-- Sidebar -->
+    <div class="sidebar" [class.active]="isSidebarOpen">
+        <div class="logo">
+            <h2>GGU Hostel</h2>
+        </div>
+        <ul class="nav-links">
+            <li [class.active]="activeTab === 'dashboard'" (click)="activeTab = 'dashboard'; isSidebarOpen = false">
+                <span>📊</span> Dashboard
+            </li>
+            <li [class.active]="activeTab === 'boys'" (click)="showTab('boys'); isSidebarOpen = false">
+                <span>👨</span> Boys Hostel
+            </li>
+            <li [class.active]="activeTab === 'girls'" (click)="showTab('girls'); isSidebarOpen = false">
+                <span>👩</span> Girls Hostel
+            </li>
+            <li [class.active]="activeTab === 'attendance'" (click)="setActiveTab('attendance')">
+                <span>📅</span> Attendance
+            </li>
+            <li [class.active]="activeTab === 'rooms'" (click)="showTab('rooms'); isSidebarOpen = false">
+                <span>🛏️</span> Rooms
+            </li>
+            <li [class.active]="activeTab === 'add-student'" (click)="activeTab = 'add-student'; isSidebarOpen = false">
+                <span>➕</span> Add Student
+            </li>
+            <li [class.active]="activeTab === 'complaints'" (click)="setActiveTab('complaints')">
+                <span>📢</span> Complaints
+            </li>
+            <li [class.active]="activeTab === 'permissions'" (click)="setActiveTab('permissions')">
+                <span>📝</span> Permissions
+            </li>
+            <li [class.active]="activeTab === 'history'" (click)="showTab('history'); isSidebarOpen = false">
+                <span>🕒</span> History
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <button (click)="authService.logout()">🚪 Logout</button>
+        </div>
+    </div>
+
+    <!-- Overlay for mobile sidebar -->
+    <div class="sidebar-overlay" *ngIf="isSidebarOpen" (click)="isSidebarOpen = false"></div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header>
+            <div class="header-left">
+                <button class="menu-btn" (click)="toggleSidebar()">☰</button>
+                <h3>{{ activeTab | titlecase }} Overview</h3>
+            </div>
+            <div class="header-actions">
+                <button class="scan-btn" (click)="showScannerModal=true">
+                    📷 SCAN QR
+                </button>
+            </div>
+        </header>
+
+        <!-- Dashboard Widgets (Only visible on 'Dashboard' tab) -->
+        <div class="dashboard-stats" *ngIf="activeTab === 'dashboard'">
+            <div class="stat-card">
+                <h3>Total Students</h3>
+                <p>Select Boys/Girls to View</p>
+            </div>
+            <div class="stat-card">
+                <h3>Pending Permissions</h3>
+                <p>{{ permissions.length }} Requests</p>
+            </div>
+            <div class="stat-card success">
+                <h3>Quick Actions</h3>
+                <button (click)="showScannerModal=true">Scan Entry/Exit</button>
+            </div>
+        </div>
+
+        <!-- Add Student Form -->
+        <div *ngIf="activeTab === 'add-student'" class="card-box">
+            <app-add-student (close)="activeTab = 'dashboard'"></app-add-student>
+        </div>
+
+        <!-- Student Tables -->
+        <div *ngIf="activeTab === 'boys' || activeTab === 'girls'" class="card-box">
+
+            <div class="table-header-actions">
+                <h3 style="margin: 0; color: #2c3e50;">{{ activeTab | titlecase }} Hostel List</h3>
+                <div class="filter-group">
+                    <label>Filter Status:</label>
+                    <select [(ngModel)]="statusFilter" (change)="onStatusFilterChange()">
+                        <option value="">All Students</option>
+                        <option value="IN_HOSTEL">In Hostel</option>
+                        <option value="OUTING">Outing</option>
+                        <option value="HOME">Home</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive-container">
+                <table class="modern-table" style="margin-top: 15px;">
+                    <thead>
+                        <tr>
+                            <th>Hostel ID</th>
+                            <th>Pin</th>
+                            <th>Name</th>
+                            <th>Year</th>
+                            <th>Branch</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let s of students">
+                            <td data-label="Hostel ID">{{ formatHostelId(s.hostelId) || '--' }}</td>
+                            <td data-label="Pin">{{ s.collegePin }}</td>
+                            <td data-label="Name">
+                                <div class="student-info">
+                                    <img [src]="s.profileImage || 'assets/default-avatar.png'" class="avatar-small">
+                                    {{ s.name }}
+                                </div>
+                            </td>
+                            <td data-label="Year">{{ s.currentYear }}</td>
+                            <td data-label="Branch">{{ s.branch }}</td>
+                            <td data-label="Status">
+                                <span class="status-badge" [class]="s.status">{{ getFormattedStatus(s.status) }}</span>
+                            </td>
+                            <td data-label="Actions">
+                                <button class="view-btn" (click)="viewStudent(s)" style="margin-right: 5px;">👁
+                                    View</button>
+                                <button class="delete-btn" (click)="confirmDeleteStudent(s)"
+                                    onclick="event.stopPropagation()"
+                                    style="background: #e74c3c; color: white; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.9rem;">
+                                    🗑️ Delete
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Attendance Section -->
+        <div *ngIf="activeTab === 'attendance'" class="card-box full-width-card">
+
+            <!-- History Mode Header -->
+            <div *ngIf="showAttendanceHistory" class="history-view">
+                <div class="table-header-actions">
+                    <div class="header-left">
+                        <h3>📜 Attendance History</h3>
+                    </div>
+                    <div class="header-actions-row">
+                        <div class="search-wrapper">
+                            <input type="text" [(ngModel)]="historySearchPin" (keyup.enter)="searchStudentHistory()"
+                                placeholder="Search by PIN..." class="modern-search">
+                            <button (click)="searchStudentHistory()" class="icon-btn">🔍</button>
+                        </div>
+                        <button *ngIf="isStudentHistoryMode" (click)="resetHistoryView()" class="btn-clear">
+                            ✕ Clear Filter
+                        </button>
+                        <button (click)="showAttendanceHistory = false" class="btn-secondary">
+                            ← Back to Today
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-responsive-container">
+                    <!-- Global Daily Summary Table -->
+                    <table class="modern-table" *ngIf="!isStudentHistoryMode">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Present</th>
+                                <th>Absent</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let h of attendanceHistory">
+                                <td data-label="Date">{{ h[0] | date:'mediumDate' }}</td> <!-- Date -->
+                                <td data-label="Present" style="color: green; font-weight: bold;">{{ h[1] }}</td>
+                                <!-- Present Count -->
+                                <td data-label="Absent" style="color: red; font-weight: bold;">{{ h[2] }}</td>
+                                <!-- Absent Count -->
+                                <td data-label="Action">
+                                    <button (click)="viewHistoryDate(h[0])" class="view-btn">View Log</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Single Student History Table -->
+                    <div *ngIf="isStudentHistoryMode" class="student-history-panel">
+                        <h4 class="history-title">History for PIN: <span>{{ historySearchPin }}</span></h4>
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Day</th>
+                                    <th>Status</th>
+                                    <th>Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let record of studentHistory">
+                                    <td data-label="Date">{{ record.date | date:'mediumDate' }}</td>
+                                    <td data-label="Day">{{ record.date | date:'EEEE' }}</td>
+                                    <td data-label="Status">
+                                        <span class="status-pill" [ngClass]="record.status">
+                                            {{ record.status }}
+                                        </span>
+                                    </td>
+                                    <td data-label="Remarks">{{ record.remarks || '--' }}</td>
+                                </tr>
+                                <tr *ngIf="studentHistory.length === 0">
+                                    <td colspan="4" class="no-data">No records found.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Attendance Mode -->
+            <div *ngIf="!showAttendanceHistory">
+                <div class="attendance-toolbar">
+                    <div class="toolbar-left">
+                        <h2 class="section-title">Daily Attendance</h2>
+                        <span class="day-badge">{{ attendanceDay }}</span>
+                    </div>
+
+                    <div class="toolbar-center">
+                        <div class="toggle-group">
+                            <button [class.active]="attendanceGender === 'MALE'" (click)="setAttendanceGender('MALE')"
+                                class="toggle-btn boys">
+                                👨 Boys
+                            </button>
+                            <button [class.active]="attendanceGender === 'FEMALE'"
+                                (click)="setAttendanceGender('FEMALE')" class="toggle-btn girls">
+                                👩 Girls
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="toolbar-right">
+                        <input type="date" [ngModel]="attendanceDate | date:'yyyy-MM-dd'"
+                            (ngModelChange)="onDateChange($event)" class="date-input">
+                        <button (click)="loadAttendanceHistory()" class="btn-outline">
+                            📜 View History
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-bar" style="justify-content: flex-start;">
+                    <div class="search-inputs">
+                        <div class="input-group" style="max-width: 400px;">
+                            <span class="icon">🏢</span>
+                            <input type="text" [(ngModel)]="attendanceHostelId" placeholder="Filter by Hostel ID..."
+                                class="search-field">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Table -->
+                <div class="table-responsive-container">
+                    <div *ngIf="filteredAttendanceList.length === 0" class="empty-state">
+                        <p>No students found matching filters.</p>
+                    </div>
+
+                    <table class="modern-table" *ngIf="filteredAttendanceList.length > 0">
+                        <thead>
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="25%">Student Details</th>
+                                <th width="15%">Hostel info</th>
+                                <th width="20%">Contact Info</th>
+                                <th width="20%" class="text-center">Attendance Status</th>
+                                <th width="15%">Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let record of filteredAttendanceList; let i = index"
+                                [class.row-home]="record.student.status === 'HOME'">
+                                <td data-label="#">{{ i + 1 }}</td>
+                                <td data-label="Student Details">
+                                    <div class="student-profile-mini">
+                                        <div class="info">
+                                            <span class="name">{{ record.student.name }}</span>
+                                            <span class="pin">{{ record.student.collegePin }}</span>
+                                            <span *ngIf="record.student.status === 'HOME'" class="badge-home">🏠
+                                                HOME</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-label="Hostel Info">
+                                    <div class="hostel-info">
+                                        <span class="hid-label">ID:</span> <strong>{{ record.student.hostelId || '--'
+                                            }}</strong>
+                                    </div>
+                                </td>
+                                <td data-label="Contact Info">
+                                    <div class="contact-info">
+                                        <div class="c-row" *ngIf="record.student.mobileNumber">
+                                            <span class="icon">📞</span>
+                                            <a [href]="'tel:' + record.student.mobileNumber" class="mobile-link">
+                                                {{ record.student.mobileNumber }}
+                                            </a>
+                                        </div>
+                                        <div class="c-row text-muted">
+                                            <span class="icon">👨‍👩‍👦</span>
+                                            <a [href]="'tel:' + record.student.parentMobileNumber" class="mobile-link">
+                                                {{ record.student.parentMobileNumber }}
+                                            </a>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td data-label="Attendance Status" class="text-center">
+                                    <!-- If HOME, Show Blocked Message -->
+                                    <div *ngIf="record.student.status === 'HOME'" class="status-blocked">
+                                        <span>🚫 Not Available</span>
+                                    </div>
+
+                                    <!-- If IN_HOSTEL or OUTING, Show Buttons -->
+                                    <div *ngIf="record.student.status !== 'HOME'" class="status-switcher">
+                                        <button (click)="markPresent(record)" class="switch-btn present"
+                                            [class.active]="record.status === 'PRESENT'">
+                                            P
+                                        </button>
+                                        <button (click)="markAbsent(record)" class="switch-btn absent"
+                                            [class.active]="record.status === 'ABSENT'">
+                                            A
+                                        </button>
+                                    </div>
+                                </td>
+                                <td data-label="Remarks">
+                                    <input type="text" [(ngModel)]="record.remarks" placeholder="Add remark..."
+                                        class="remark-input">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Floating Save Button -->
+                <div class="save-bar">
+                    <button (click)="saveAttendance()" class="btn-save-floating">
+                        💾 Save Attendance Now
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Complaints Tab -->
+        <div *ngIf="activeTab === 'complaints'" class="tab-content fade-in">
+            <h2>📢 Student Complaints</h2>
+            <div class="full-width-card" style="padding: 20px;">
+                <div class="table-responsive-container">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Student</th>
+                                <th>Location</th>
+                                <th>Complaint</th>
+                                <th>Proof</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let c of complaintsList">
+                                <td data-label="Date">{{ c.submittedDate | date:'short' }}</td>
+                                <td data-label="Student">
+                                    <strong>{{ c.student.name }}</strong><br>
+                                    <small>{{ c.student.collegePin }}</small>
+                                </td>
+                                <td data-label="Location">
+                                    Hostel: {{ c.hostelId }}<br>
+                                    Block: {{ c.block }} | Room: {{ c.roomNo }}
+                                </td>
+                                <td data-label="Complaint" class="complaint-desc-cell">
+                                    <strong>{{ c.category }}</strong><br>
+                                    {{ c.description }}
+                                </td>
+                                <td data-label="Proof">
+                                    <button *ngIf="c.proofImage" class="btn-outline" (click)="viewProof(c.proofImage)">
+                                        📷 View
+                                    </button>
+                                    <span *ngIf="!c.proofImage" style="color:#aaa;">No Proof</span>
+                                </td>
+                                <td data-label="Status">
+                                    <span class="status-badge" [class]="c.status">{{ c.status }}</span>
+                                </td>
+                                <td data-label="Action">
+                                    <div *ngIf="c.status === 'OPEN' || c.status === 'IN_PROGRESS'">
+                                        <button (click)="updateComplaintStatus(c.id, 'RESOLVED')"
+                                            class="btn-tiny current">✅
+                                            Fix</button>
+                                        <button (click)="updateComplaintStatus(c.id, 'REJECTED')"
+                                            class="btn-tiny rejected" style="margin-left: 5px;">❌ One</button>
+                                    </div>
+                                    <span *ngIf="c.status === 'RESOLVED'" style="color: green;">✔ Done</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Proof Modal -->
+        <div class="modal-overlay" *ngIf="selectedProofImage" (click)="closeProof()">
+            <div class="modal-content" (click)="$event.stopPropagation()" style="text-align: center;">
+                <span class="close-btn" (click)="closeProof()">&times;</span>
+                <h3>Complaint Proof</h3>
+                <img [src]="selectedProofImage" style="max-width: 100%; max-height: 70vh; border-radius: 8px;">
+            </div>
+        </div>
+
+        <!-- Permissions Table (Pending) -->
+        <div *ngIf="activeTab === 'permissions'" class="card-box">
+            <h3 style="margin-bottom: 20px;">Pending Requests</h3>
+            <div class="table-responsive-container">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Parent Mobile</th>
+                            <th>Type</th>
+                            <th>Reason</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let p of permissions">
+                            <td data-label="Student">{{ p.student?.name }} ({{ p.student?.collegePin }})</td>
+                            <td data-label="Parent Mobile">{{ p.student?.parentMobileNumber || 'N/A' }}</td>
+                            <td data-label="Type">{{ p.type }}</td>
+                            <td data-label="Reason">{{ p.reason }}</td>
+                            <td data-label="Date">{{ p.requestDate | date:'short' }}</td>
+                            <td data-label="Actions">
+                                <button *ngIf="p.type === 'OUTING' && p.proofImage" class="action-btn view-btn"
+                                    (click)="viewLetter(p.proofImage)">📄 View Letter</button>
+                                <span *ngIf="p.type === 'OUTING' && !p.proofImage" class="no-letter-badge">No
+                                    Letter</span>
+                                <button class="action-btn approve" (click)="approve(p.id)">Approve</button>
+                                <button class="action-btn reject" (click)="reject(p.id)">Reject</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- History Table (All/Processed) -->
+        <div *ngIf="activeTab === 'history'" class="card-box">
+            <h3 style="margin-bottom: 20px;">Approval History</h3>
+            <div class="table-responsive-container">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Parent Mobile</th>
+                            <th>Type</th>
+                            <th>Reason</th>
+                            <th>Requested On</th>
+                            <th>Processed On</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let h of history">
+                            <td data-label="Student">{{ h.student?.name }} ({{ h.student?.collegePin }})</td>
+                            <td data-label="Parent Mobile">{{ h.student?.parentMobileNumber || 'N/A' }}</td>
+                            <td data-label="Type">{{ h.type }}</td>
+                            <td data-label="Reason">{{ h.reason }}</td>
+                            <td data-label="Requested On">{{ h.requestDate | date:'short' }}</td>
+                            <td data-label="Processed On">{{ h.approvalDate | date:'short' }}</td>
+                            <td data-label="Status">
+                                <span class="status-badge" [class]="h.status">{{ getFormattedStatus(h.status)
+                                    }}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- Rooms & Availability Tab -->
+        <div *ngIf="activeTab === 'rooms'" class="card-box">
+            <div class="rooms-header"
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 *ngIf="!selectedHostelView">🛏️ Hostel Room Allocation</h3>
+                <h3 *ngIf="selectedHostelView">
+                    <button (click)="clearHostelView()" class="btn-outline" style="margin-right: 15px;">⬅ Back</button>
+                    {{ selectedHostelView === 'BOYS' ? '👨 Boys Hostel' : (selectedHostelView === 'GIRLS' ? '👩 Girls
+                    Hostel' : '❄️ AC Hostel') }}
+                </h3>
+                <button (click)="loadRoomAvailability()" class="scan-btn" style="padding: 8px 16px; font-size: 0.9rem;">
+                    🔄 Refresh Rooms
+                </button>
+            </div>
+
+            <!-- Landing Page: 3 Large Buttons -->
+            <div *ngIf="!selectedHostelView" class="dashboard-stats">
+                <div class="stat-card" (click)="selectHostelView('BOYS')"
+                    style="cursor: pointer; transition: transform 0.2s; border: 1px solid #3498db;">
+                    <h3 style="color: #3498db;">👨 Boys Hostel</h3>
+                    <p>{{ boysRooms.length }} Rooms</p>
+                    <p style="font-size: 0.9rem; color: #666;">Blocks A, B (101-200)</p>
+                </div>
+                <div class="stat-card" (click)="selectHostelView('GIRLS')"
+                    style="cursor: pointer; transition: transform 0.2s; border: 1px solid #e91e63;">
+                    <h3 style="color: #e91e63;">👩 Girls Hostel</h3>
+                    <p>{{ girlsRooms.length }} Rooms</p>
+                    <p style="font-size: 0.9rem; color: #666;">Blocks C, D (201-300)</p>
+                </div>
+                <div class="stat-card" (click)="selectHostelView('AC')"
+                    style="cursor: pointer; transition: transform 0.2s; border: 1px solid #00bcd4;">
+                    <h3 style="color: #00bcd4;">❄️ AC Hostel</h3>
+                    <p>{{ acRooms.length }} Rooms</p>
+                    <p style="font-size: 0.9rem; color: #666;">Block E (301-350)</p>
+                </div>
+            </div>
+
+            <!-- Boys Hostel Section -->
+            <div *ngIf="selectedHostelView === 'BOYS'" class="hostel-section fade-in">
+                <div class="rooms-grid-container">
+                    <div class="room-card" *ngFor="let room of boysRooms" [class.full]="room.status === 'FULL'"
+                        (click)="viewRoomDetails(room)">
+                        <div class="room-header">
+                            <span class="room-no">Room {{ room.roomNo }}</span>
+                            <span class="block-badge">{{ room.block }} Block</span>
+                        </div>
+                        <div class="room-body">
+                            <div class="occupancy-info">
+                                <span class="label">Occupied:</span>
+                                <span class="value">{{ room.occupants }} / {{ room.capacity }}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="fill" [style.width.%]="(room.occupants / room.capacity) * 100"
+                                    [style.background]="room.status === 'FULL' ? '#e74c3c' : '#2ecc71'">
+                                </div>
+                            </div>
+                            <div class="status-text" [style.color]="room.status === 'FULL' ? '#e74c3c' : '#2ecc71'">
+                                {{ room.status === 'FULL' ? 'Full' : 'Available' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Girls Hostel Section -->
+            <div *ngIf="selectedHostelView === 'GIRLS'" class="hostel-section fade-in">
+                <div class="rooms-grid-container">
+                    <div class="room-card" *ngFor="let room of girlsRooms" [class.full]="room.status === 'FULL'"
+                        (click)="viewRoomDetails(room)">
+                        <div class="room-header">
+                            <span class="room-no">Room {{ room.roomNo }}</span>
+                            <span class="block-badge">{{ room.block }} Block</span>
+                        </div>
+                        <div class="room-body">
+                            <div class="occupancy-info">
+                                <span class="label">Occupied:</span>
+                                <span class="value">{{ room.occupants }} / {{ room.capacity }}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="fill" [style.width.%]="(room.occupants / room.capacity) * 100"
+                                    [style.background]="room.status === 'FULL' ? '#e74c3c' : '#2ecc71'">
+                                </div>
+                            </div>
+                            <div class="status-text" [style.color]="room.status === 'FULL' ? '#e74c3c' : '#2ecc71'">
+                                {{ room.status === 'FULL' ? 'Full' : 'Available' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AC Rooms Section -->
+            <div *ngIf="selectedHostelView === 'AC'" class="hostel-section fade-in">
+                <div class="rooms-grid-container">
+                    <div class="room-card" *ngFor="let room of acRooms" [class.full]="room.status === 'FULL'"
+                        (click)="viewRoomDetails(room)">
+                        <div class="room-header">
+                            <span class="room-no">Room {{ room.roomNo }}</span>
+                            <span class="block-badge">{{ room.block }} Block</span>
+                        </div>
+                        <div class="room-body">
+                            <div class="occupancy-info">
+                                <span class="label">Occupied:</span>
+                                <span class="value">{{ room.occupants }} / {{ room.capacity }}</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="fill" [style.width.%]="(room.occupants / room.capacity) * 100"
+                                    [style.background]="room.status === 'FULL' ? '#e74c3c' : '#2ecc71'">
+                                </div>
+                            </div>
+                            <div class="status-text" [style.color]="room.status === 'FULL' ? '#e74c3c' : '#2ecc71'">
+                                {{ room.status === 'FULL' ? 'Full' : 'Available' }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="boysRooms.length === 0 && girlsRooms.length === 0" class="empty-state">
+                <p>No room data found. Please Ensure Backend is Running.</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Room Details Modal -->
+<div class="modal-overlay" *ngIf="selectedRoom" (click)="closeRoomModal()">
+    <div class="modal-content detail-modal" (click)="$event.stopPropagation()">
+        <span class="close-btn" (click)="closeRoomModal()"
+            style="font-size: 3rem; color: white; cursor: pointer; position: absolute; top: 10px; right: 20px; transition: color 0.2s; z-index: 10;">&times;</span>
+        <style>
+            .close-btn:hover {
+                color: #ffdddd !important;
+                /* Lighter red or just white transparency */
+            }
+        </style>
+
+        <div class="detail-header" style="color: white;">
+            <h3 style="color: white; margin-bottom: 5px;">Room {{ selectedRoom.roomNo }} - {{ selectedRoom.block }}
+                Block</h3>
+            <!-- Removed 'Boys Hostel' heading as requested -->
+        </div>
+
+        <div class="occupants-list">
+            <h4>Occupants ({{ roomOccupants.length }} / {{ selectedRoom.capacity }})</h4>
+
+            <div *ngIf="roomOccupants.length === 0" class="empty-state-text">
+                Room is currently empty.
+            </div>
+
+            <div class="occupant-card" *ngFor="let student of roomOccupants"
+                style="position: relative; background: white; border: 1px solid #eee; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: transform 0.2s; cursor: default; margin-bottom: 10px; padding: 15px; border-radius: 10px; display: flex; align-items: center;">
+
+                <!-- Cross Mark (Remove) - Positioned Top Right -->
+                <button (click)="confirmRemoveStudent(student.collegePin)" class="remove-btn"
+                    style="position: absolute; top: 5px; right: 8px; background: none; border: none; color: #c0392b; font-size: 1.5rem; font-weight: bold; cursor: pointer; transition: transform 0.2s;"
+                    title="Remove Student">
+                    &times;
+                </button>
+
+                <img [src]="student.profileImage || 'assets/default-avatar.png'" class="avatar-small"
+                    style="border: 2px solid #e0e0e0; padding: 2px; width: 50px; height: 50px; border-radius: 50%; margin-right: 15px; flex-shrink: 0;">
+
+                <div class="occ-info" style="flex: 1;">
+                    <span class="name"
+                        style="color: #333; font-size: 1rem; font-weight: 700; display: block; margin-bottom: 4px;">{{
+                        student.name }}</span>
+                    <span class="pin" style="color: #666; font-weight: 500; font-size: 0.85rem; display: block;">Hostel
+                        ID: {{ student.hostelId || 'N/A' }}</span>
+                    <span class="phone" style="color: #888; font-size: 0.8rem; display: block;">Parent: {{
+                        student.parentMobileNumber || 'N/A' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-footer" style="padding: 20px; text-align: right; border-top: 1px solid #eee;">
+            <button (click)="openAllocateModal()" class="scan-btn"
+                style="background: linear-gradient(135deg, #1e3c72, #2a5298); border: none; padding: 10px 20px; border-radius: 8px; color: white; cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(30, 60, 114, 0.3);">
+                ➕ Allocate Student
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Remove Confirmation Modal -->
+<div class="modal-overlay" *ngIf="showRemoveConfirmation" (click)="cancelRemove()" style="z-index: 2500;">
+    <div class="modal-content" (click)="$event.stopPropagation()"
+        style="width: 400px; padding: 30px; border-radius: 16px; text-align: center; border-top: 5px solid #e74c3c;">
+        <span class="close-btn" (click)="cancelRemove()"
+            style="position: absolute; top: 10px; right: 20px; font-size: 2rem; color: #aaa; cursor: pointer;">&times;</span>
+
+        <div style="margin-bottom: 20px;">
+            <span style="font-size: 3rem; color: #e74c3c; display: block; margin-bottom: 10px;">⚠️</span>
+            <h3 style="color: #c0392b; margin: 0; font-size: 1.5rem;">Remove Student?</h3>
+        </div>
+
+        <p style="color: #555; margin-bottom: 30px; line-height: 1.5;">
+            Are you sure you want to remove this student from the room? This action will generate a vacancy.
+        </p>
+
+        <div style="display: flex; gap: 15px; justify-content: center;">
+            <button (click)="cancelRemove()"
+                style="padding: 10px 20px; border: 1px solid #ddd; background: white; color: #555; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                Cancel
+            </button>
+            <button (click)="proceedWithRemove()"
+                style="padding: 10px 20px; border: none; background: #e74c3c; color: white; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);">
+                Remove Student
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal-overlay" *ngIf="showDeleteConfirmation" (click)="cancelDelete()" style="z-index: 2500;">
+    <div class="modal-content" (click)="$event.stopPropagation()"
+        style="width: 400px; padding: 30px; border-radius: 16px; text-align: center; border-top: 5px solid #e74c3c;">
+        <span class="close-btn" (click)="cancelDelete()"
+            style="position: absolute; top: 10px; right: 20px; font-size: 2rem; color: #aaa; cursor: pointer;">&times;</span>
+
+        <div style="margin-bottom: 20px;">
+            <span style="font-size: 3rem; color: #e74c3c; display: block; margin-bottom: 10px;">🗑️</span>
+            <h3 style="color: #c0392b; margin: 0; font-size: 1.5rem;">Delete Student?</h3>
+        </div>
+
+        <p style="color: #555; margin-bottom: 30px; line-height: 1.5;">
+            Are you sure you want to permanently delete <strong>{{ studentToDelete?.name }}</strong>? This action cannot
+            be undone.
+        </p>
+
+        <div style="display: flex; gap: 15px; justify-content: center;">
+            <button (click)="cancelDelete()"
+                style="padding: 10px 20px; border: 1px solid #ddd; background: white; color: #555; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                Cancel
+            </button>
+            <button (click)="proceedWithDelete()"
+                style="padding: 10px 20px; border: none; background: #e74c3c; color: white; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);">
+                Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Allocate Student Modal -->
+<div class="modal-overlay" *ngIf="showAllocateModal" (click)="closeAllocateModal()" style="z-index: 2000;">
+    <div class="modal-content detail-modal" (click)="$event.stopPropagation()"
+        style="width: 450px; max-width: 90%; border-radius: 20px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);">
+
+        <!-- Premium Cross Mark (Close Button) -->
+        <button (click)="closeAllocateModal()"
+            style="position: absolute; top: 15px; right: 15px; background: #fff0f0; border: none; width: 36px; height: 36px; border-radius: 50%; color: #e74c3c; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <span style="display: block; line-height: 1; margin-top: -2px;">&times;</span>
+        </button>
+
+        <h3 style="margin-bottom: 25px; color: #2c3e50; font-size: 1.5rem; text-align: center; font-weight: 700;">
+            Allocate Room</h3>
+
+        <div class="search-section" style="margin-bottom: 25px;">
+            <label
+                style="display: block; margin-bottom: 10px; color: #7f8c8d; font-size: 0.95rem; font-weight: 500;">Enter
+                Hostel ID</label>
+            <div style="display: flex; gap: 12px;">
+                <input type="text" [(ngModel)]="allocateSearchPin" (keyup.enter)="searchStudentForAllocation()"
+                    placeholder="e.g. 423787"
+                    style="flex: 1; padding: 12px 20px; border: 2px solid #edf2f7; border-radius: 50px; outline: none; font-size: 1rem; transition: border-color 0.2s; background: #f8fafc;">
+                <button (click)="searchStudentForAllocation()"
+                    style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; border: none; width: 48px; height: 48px; border-radius: 50%; cursor: pointer; box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3); display: flex; align-items: center; justify-content: center; transition: transform 0.2s;">
+                    <span style="font-size: 1.2rem;">🔍</span>
+                </button>
+            </div>
+        </div>
+
+        <div *ngIf="searchedStudent" class="student-preview"
+            style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e9ecef; margin-bottom: 20px;">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <img [src]="searchedStudent.profileImage || 'assets/default-avatar.png'"
+                    style="width: 50px; height: 50px; border-radius: 50%; margin-right: 15px; border: 2px solid #3498db;">
+                <div>
+                    <h4 style="margin: 0; color: #2c3e50;">{{ searchedStudent.name }}</h4>
+                    <p style="margin: 5px 0 0; color: #7f8c8d; font-size: 0.9rem;">{{ searchedStudent.collegePin }}</p>
+                </div>
+            </div>
+            <div class="details-grid"
+                style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9rem;">
+                <div>
+                    <span style="color: #999;">Parent Mobile:</span>
+                    <p style="margin: 2px 0; color: #333; font-weight: 500;">{{ searchedStudent.parentMobileNumber ||
+                        'N/A' }}</p>
+                </div>
+                <div>
+                    <span style="color: #999;">Hostel ID:</span>
+                    <p style="margin: 2px 0; color: #333;">{{ searchedStudent.hostelId || 'N/A' }}</p>
+                </div>
+            </div>
+        </div>
+
+        <button (click)="confirmAllocation()" [disabled]="!searchedStudent"
+            style="width: 100%; background: linear-gradient(135deg, #2ecc71, #27ae60); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: opacity 0.2s;"
+            [style.opacity]="!searchedStudent ? '0.5' : '1'">
+            Confirm Allocation
+        </button>
+    </div>
+</div>
+
+<!-- Real QR Scanner Modal -->
+<div class="modal-overlay" *ngIf="showScannerModal" (click)="showScannerModal=false">
+    <div class="modal-content scanner-modal" (click)="$event.stopPropagation()">
+        <span class="close-btn" (click)="showScannerModal=false">&times;</span>
+        <h3>Scan Student QR</h3>
+
+        <div class="status-indicator" [class]="scanStatus">
+            <span *ngIf="scanStatus === 'PENDING'">Status: PENDING</span>
+            <span *ngIf="scanStatus === 'SUCCESS'" style="color: #00ff00; font-size: 24px;">
+                ✅ SUCCESS
+            </span>
+        </div>
+
+        <div class="camera-box">
+            <div *ngIf="hasPermission === false" class="error-overlay">
+                <p>🚫 Camera Permission Denied</p>
+            </div>
+            <div *ngIf="hasDevices === false && hasPermission !== false" class="error-overlay">
+                <p>⚠️ No Cameras Found</p>
+            </div>
+
+            <zxing-scanner [device]="currentDevice" (camerasFound)="onCamerasFound($event)"
+                (permissionResponse)="onHasPermission($event)" (scanSuccess)="onCodeResult($event)"
+                (scanError)="onScanError($event)" [formats]="allowedFormats" [tryHarder]="true">
+            </zxing-scanner>
+        </div>
+        <p class="scan-instruction">Point camera at the GGU Student QR Code</p>
+
+        <!-- Device Selector -->
+        <div class="scan-type-select" *ngIf="hasDevices && availableDevices.length > 1">
+            <label>Camera: </label>
+            <select (change)="onDeviceSelectChange($any($event).target.value)">
+                <option *ngFor="let device of availableDevices" [value]="device.deviceId"
+                    [selected]="currentDevice && device.deviceId === currentDevice.deviceId">
+                    {{ device.label || device.deviceId }}
+                </option>
+            </select>
+        </div>
+
+        <div class="upload-option">
+            <p>Or Upload QR Image:</p>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*">
+        </div>
+    </div>
+</div>
+
+<!-- Permission Letter View Modal -->
+<div class="modal-overlay" *ngIf="viewingLetter" (click)="closeLetter()">
+    <div class="modal-content letter-view-modal" (click)="$event.stopPropagation()">
+        <span class="close-btn" (click)="closeLetter()">&times;</span>
+        <h3>Permission Letter</h3>
+        <div class="letter-image-container">
+            <img [src]="viewingLetter" alt="Permission Letter">
+        </div>
+    </div>
+</div>
+
+<!-- Scanned Permission Letter Modal -->
+<div class="modal-overlay" *ngIf="showLetterModal" (click)="showLetterModal=false">
+    <div class="modal-content letter-modal" (click)="$event.stopPropagation()">
+        <span class="close-btn" (click)="showLetterModal=false">&times;</span>
+
+        <div class="scan-result-header success">
+            <h2>{{ scannedData?.message }}</h2>
+        </div>
+
+        <div *ngIf="scannedData?.latestPermission; else noPermission" class="letter-body">
+            <div class="letter-head">
+                <h2 style="color: #333;">GGU HOSTEL</h2>
+                <h3 style="color: #555;">PERMISSION PASS</h3>
+                <p><strong>Approved:</strong> {{ scannedData.latestPermission.approvalDate | date:'medium' }}</p>
+            </div>
+
+            <div class="student-summary">
+                <img [src]="scannedData.student.profileImage" class="profile-pic-large">
+                <div>
+                    <p><strong>{{ scannedData.student.name }}</strong></p>
+                    <p>{{ scannedData.student.collegePin }} | {{ scannedData.student.gender }}</p>
+                </div>
+            </div>
+
+            <hr>
+            <p><strong>Request Type:</strong> <span class="badge">{{ scannedData.latestPermission.type }}</span></p>
+            <p><strong>Reason:</strong> {{ scannedData.latestPermission.reason }}</p>
+
+            <!-- Outing Warning Note -->
+            <div *ngIf="scannedData.latestPermission.type === 'OUTING'" class="outing-warning">
+                ⚠️ IMPORTANT: Return to hostel before 8:00 PM otherwise fine will be imposed.
+            </div>
+
+            <br>
+            <div class="status-summary">
+                <p>Current Status: <strong>{{ getFormattedStatus(scannedData.student.status) }}</strong></p>
+            </div>
+
+            <div *ngIf="scannedData.latestPermission.status === 'APPROVED'" class="approved-stamp">✅ APPROVED</div>
+            <div *ngIf="scannedData.latestPermission.status === 'USED'" class="approved-stamp used">✅ RETURNED</div>
+        </div>
+
+        <ng-template #noPermission>
+            <div class="no-perm">
+                <img [src]="scannedData?.student?.profileImage" class="profile-pic-large">
+                <h3>{{ scannedData?.student?.name }}</h3>
+                <p>Status Updated To: <strong>{{ getFormattedStatus(scannedData?.student?.status) }}</strong></p>
+                <p>No Recent Permission Found.</p>
+            </div>
+        </ng-template>
+    </div>
+</div>
+
+<!-- Student Detail Modal -->
+<div class="modal-overlay" *ngIf="selectedStudent" (click)="selectedStudent = null">
+    <div class="modal-content detail-modal" (click)="$event.stopPropagation()">
+        <span class="close-btn" (click)="selectedStudent = null">&times;</span>
+
+        <div class="detail-header">
+            <img [src]="selectedStudent.profileImage || 'assets/default-avatar.png'" class="detail-pic">
+            <div class="header-info">
+                <h2>{{ selectedStudent.name }}</h2>
+                <p>{{ selectedStudent.collegePin }}</p>
+                <span class="status-badge">{{ getFormattedStatus(selectedStudent.status) }}</span>
+            </div>
+            <!-- Download Button Removed for Admin -->
+        </div>
+
+        <div class="detail-grid">
+            <div class="detail-item">
+                <label>Hostel ID</label> <span>{{ selectedStudent.hostelId || 'N/A' }}</span>
+            </div>
+            <div class="detail-item">
+                <label>Branch</label> <span>{{ selectedStudent.branch }}</span>
+            </div>
+            <div class="detail-item">
+                <label>Year</label> <span>{{ selectedStudent.currentYear }}</span>
+            </div>
+            <div class="detail-item">
+                <label>Department</label> <span>{{ selectedStudent.department }}</span>
+            </div>
+            <div class="detail-item">
+                <label>Gender</label> <span>{{ selectedStudent.gender }}</span>
+            </div>
+            <div class="detail-item">
+                <label>Mobile</label> <span>{{ selectedStudent.parentMobileNumber }}</span>
+            </div>
+            <div class="detail-item full-width">
+                <label>Address</label>
+                <span>{{ selectedStudent.village }}, {{ selectedStudent.mandal }}, {{ selectedStudent.district }},
+                    {{
+                    selectedStudent.state }}</span>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,38 @@
+<div class="add-student-form styled-form-card">
+    <div style="position: relative;">
+        <h3>Register New Student</h3>
+        <span class="close-card-btn" (click)="closeCard()">&times;</span>
+    </div>
+    <form (ngSubmit)="onSubmit()">
+        <div class="grid">
+            <input [(ngModel)]="student.name" name="name" placeholder="Full Name" required>
+            <input [(ngModel)]="student.collegePin" name="pin" placeholder="College Pin" required>
+            <input [(ngModel)]="student.hostelId" name="hostelId" placeholder="Hostel ID">
+            <input [(ngModel)]="student.password" name="password" placeholder="Password" type="password" required>
+
+            <select [(ngModel)]="student.gender" name="gender">
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+            </select>
+
+            <input [(ngModel)]="student.branch" name="branch" placeholder="Branch">
+            <input [(ngModel)]="student.department" name="dept" placeholder="Department">
+            <input [(ngModel)]="student.currentYear" name="year" placeholder="Year">
+            <input [(ngModel)]="student.parentMobileNumber" name="mobile" placeholder="Parent Mobile">
+
+            <!-- Address -->
+            <input [(ngModel)]="student.village" name="village" placeholder="Village">
+            <input [(ngModel)]="student.mandal" name="mandal" placeholder="Mandal">
+            <input [(ngModel)]="student.district" name="district" placeholder="District">
+            <input [(ngModel)]="student.state" name="state" placeholder="State">
+            <input [(ngModel)]="student.country" name="country" placeholder="Country">
+        </div>
+
+        <div class="file-upload-container">
+            <label>Profile Image Upload</label>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*">
+        </div>
+
+        <button type="submit">Register Student</button>
+    </form>
+</div>

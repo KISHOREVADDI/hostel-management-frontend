@@ -1,0 +1,60 @@
+/* Global Styles */
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    /* Critical for mobile stability */
+    position: relative;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+}
+
+h1,
+h2,
+h3 {
+    color: #2c3e50;
+}
+
+button {
+    cursor: pointer;
+    border-radius: 4px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+input,
+select,
+textarea {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* Common Card Style */
+.card-box {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}

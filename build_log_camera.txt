@@ -1,0 +1,101 @@
+﻿node.exe : - 
+Generating browser 
+application bundles 
+(phase: setup)...
+At C:\Users\yadal\App
+Data\Roaming\npm\ng.p
+s1:24 char:5
++     & "node$exe"  "
+$basedir/node_modules
+/@angular/cli/bin/ng.
+js" $arg ...
++     ~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: (- Gener   
+ ating br...hase:    
+ setup)...:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+Γ£ö Browser 
+application bundle 
+generation complete.
+Γ£ö Browser 
+application bundle 
+generation complete.
+
+Error: src/app/compon
+ents/admin/admin-dash
+board/admin-dashboard
+.component.html:182:6
+6 - error TS2339: 
+Property 'value' 
+does not exist on 
+type 'EventTarget'.
+
+182             
+<select (change)="onD
+eviceSelectChange($ev
+ent.target.value)">
+                     
+                     
+                     
+      ~~~~~
+
+  src/app/components/
+admin/admin-dashboard
+/admin-dashboard.comp
+onent.ts:8:16
+    8   templateUrl: 
+'./admin-dashboard.co
+mponent.html',
+                     
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    Error occurs in 
+the template of 
+component AdminDashbo
+ardComponent.
+
+
+Error: src/app/compon
+ents/admin/admin-dash
+board/admin-dashboard
+.component.html:182:6
+6 - error TS2531: 
+Object is possibly 
+'null'.
+
+182             
+<select (change)="onD
+eviceSelectChange($ev
+ent.target.value)">
+                     
+                     
+                     
+      ~~~~~
+
+  src/app/components/
+admin/admin-dashboard
+/admin-dashboard.comp
+onent.ts:8:16
+    8   templateUrl: 
+'./admin-dashboard.co
+mponent.html',
+                     
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    Error occurs in 
+the template of 
+component AdminDashbo
+ardComponent.
+
+
+

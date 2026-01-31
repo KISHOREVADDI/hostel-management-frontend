@@ -1,0 +1,1042 @@
+/* Layout */
+/* Notification Toast */
+.notification-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #2ecc71;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.notification-toast.error {
+    background-color: #e74c3c;
+}
+
+.notification-toast.show {
+    transform: translateX(0);
+}
+
+.student-wrapper {
+    display: flex;
+    height: 100vh;
+    /* Fixed height for desktop app-like feel */
+    width: 100vw;
+    background-color: #f0f2f5;
+    overflow: hidden;
+    /* Prevent body scroll */
+    box-sizing: border-box;
+}
+
+/* Ensure all children inherit box-sizing or use it */
+.student-wrapper * {
+    box-sizing: border-box;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 260px;
+    background-color: #2c3e50;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    /* Fixed Layout: Sidebar is full height within wrapper */
+    height: 100%;
+    flex-shrink: 0;
+    overflow-y: auto;
+}
+
+.logo {
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid #34495e;
+    flex-shrink: 0;
+    /* Prevent logo squishing */
+}
+
+.profile-summary {
+    text-align: center;
+    padding: 30px 20px;
+    background: #34495e;
+}
+
+.sidebar-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid #3498db;
+    object-fit: cover;
+    margin-bottom: 10px;
+}
+
+.profile-summary h4 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.profile-summary p {
+    margin: 5px 0 0;
+    color: #bdc3c7;
+    font-size: 14px;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 1;
+}
+
+.nav-links li {
+    padding: 15px 25px;
+    cursor: pointer;
+    border-bottom: 1px solid #34495e;
+    transition: all 0.3s;
+}
+
+.nav-links li:hover,
+.nav-links li.active {
+    background-color: #2980b9;
+    border-left: 5px solid white;
+}
+
+.nav-links li span {
+    margin-right: 15px;
+    font-size: 18px;
+}
+
+.sidebar-footer {
+    padding: 20px;
+    border-top: 1px solid #34495e;
+}
+
+.sidebar-footer button {
+    width: 100%;
+    background-color: #e74c3c;
+    border: none;
+    padding: 10px;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 30px;
+    /* Fixed Layout: Independent scrolling area */
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* ... existing header styles ... */
+
+/* Responsive Adjustments for Complaints */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    /* Sticky Header */
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background-color: #f0f2f5;
+    padding-bottom: 15px;
+    margin-top: -10px;
+    /* Offset for padding */
+    padding-top: 10px;
+}
+
+header h3 {
+    font-size: 24px;
+    color: #333;
+    margin: 0;
+}
+
+.qr-btn {
+    background-color: #f1c40f;
+    color: #333;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Content Panels */
+.content-panel {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+
+.fade-in {
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: 0;
+    }
+}
+
+/* Profile Tab */
+.profile-cover {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.status-banner {
+    padding: 10px 40px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+.status-banner.IN_HOSTEL {
+    background: #e8f5e9;
+    color: #2ecc71;
+    border: 2px solid #2ecc71;
+}
+
+.status-banner.OUTING {
+    background: #fff3e0;
+    color: #e67e22;
+    border: 2px solid #e67e22;
+}
+
+.status-banner.HOME {
+    background: #ffebee;
+    color: #e74c3c;
+    border: 2px solid #e74c3c;
+}
+
+.profile-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.detail-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+
+.detail-card label {
+    display: block;
+    font-size: 12px;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+}
+
+.detail-card h3 {
+    margin: 0;
+    font-size: 16px;
+    color: #2c3e50;
+}
+
+.full {
+    grid-column: span 2;
+}
+
+/* Request Form */
+/* Modern Request Form Card */
+.request-form-card {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    border: 1px solid #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 140px);
+    /* Fixed height for sticky behavior */
+}
+
+/* Fixed Gradient Header */
+.card-header {
+    background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+    padding: 20px 25px;
+    position: relative;
+    flex-shrink: 0;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-header h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 0.5px;
+}
+
+/* Close Button in Header */
+.close-card-btn-student {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+    transition: all 0.3s ease;
+}
+
+.close-card-btn-student:hover {
+    color: #ff6b6b;
+    transform: rotate(90deg);
+}
+
+/* Scrollable Content Body */
+.card-body {
+    padding: 30px;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+/* Modern Inputs */
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #eef2f7;
+    border-radius: 10px;
+    font-size: 14px;
+    color: #495057;
+    transition: all 0.3s ease;
+    background-color: #f8fafc;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #3498db;
+    background-color: white;
+    box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+    outline: none;
+}
+
+.form-group textarea {
+    min-height: 120px;
+    resize: none;
+}
+
+/* File Upload Wrapper */
+.file-upload-wrapper {
+    background: #f8fafc;
+    border: 2px dashed #cbd5e0;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    transition: border-color 0.3s;
+}
+
+.file-upload-wrapper:hover {
+    border-color: #3498db;
+}
+
+/* Custom File Input Button */
+input[type="file"]::file-selector-button {
+    background-color: #34495e;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-right: 15px;
+    font-size: 13px;
+}
+
+input[type="file"]::file-selector-button:hover {
+    background: #2c3e50;
+}
+
+.submit-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 15px;
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3);
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(56, 239, 125, 0.4);
+}
+
+/* History List */
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.history-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    transition: transform 0.2s;
+}
+
+.history-card:hover {
+    /* transform: translateX(5px); Removed for stability */
+    background-color: #fcfcfc;
+}
+
+@media (min-width: 769px) {
+    .history-card:hover {
+        transform: translateX(5px);
+    }
+}
+
+.history-card.APPROVED {
+    border-left: 5px solid #2ecc71;
+    background: #feffff;
+}
+
+.history-card.REJECTED {
+    border-left: 5px solid #e74c3c;
+    background: #fffbfb;
+}
+
+.history-card.PENDING {
+    border-left: 5px solid #f1c40f;
+    background: #fffff8;
+}
+
+.card-left h4 {
+    margin: 0;
+    font-size: 16px;
+}
+
+.card-left span {
+    font-size: 12px;
+    color: #999;
+}
+
+.card-center p {
+    margin: 0;
+    color: #555;
+    font-style: italic;
+}
+
+.status-pill {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    background: #eee;
+    font-weight: bold;
+}
+
+.letter-btn-small {
+    margin-left: 10px;
+    background: none;
+    border: 1px solid #3498db;
+    color: #3498db;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 32px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+    z-index: 10;
+}
+
+.close-btn:hover {
+    color: #e74c3c;
+}
+
+.qr-container img {
+    width: 200px;
+    height: 200px;
+}
+
+.pin-display {
+    font-size: 24px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-top: 10px;
+    color: #333;
+}
+
+.letter-modal {
+    border: 5px solid #27ae60;
+    text-align: left;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .student-wrapper {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        height: 100vh;
+        z-index: 10000;
+        transition: left 0.3s ease;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        background-color: #2c3e50;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+    }
+
+    .main-content {
+        padding: 15px;
+        padding-top: 20px;
+    }
+
+    header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        width: 100%;
+    }
+
+    .menu-btn {
+        display: block;
+        background: #2c3e50;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-size: 20px;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .menu-btn:active {
+        transform: scale(0.95);
+    }
+
+    .header-actions {
+        width: 100%;
+    }
+
+    .qr-btn {
+        width: 100%;
+    }
+
+    .profile-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .request-form-card {
+        padding: 0;
+    }
+
+    .history-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .card-right {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+/* Desktop Styles */
+@media (min-width: 769px) {
+    .menu-btn {
+        display: none;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+    }
+
+    .sidebar-overlay {
+        display: none;
+    }
+}
+
+.return-instruction {
+    font-size: 11px;
+    font-weight: bold;
+    color: #e65100;
+    background: #fff3e0;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-top: 5px;
+    display: inline-block;
+}
+
+/* --- Light Theme Complaint Box --- */
+
+.complaint-card.light-theme {
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 15px rgba(226, 232, 240, 0.5);
+    padding: 0;
+    margin-bottom: 30px;
+    overflow: hidden;
+}
+
+.cp-header {
+    background: #f8fafc;
+    padding: 20px 25px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.cp-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.cp-header p {
+    margin: 5px 0 0;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.cp-body {
+    padding: 25px;
+    max-height: 60vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.form-group-light {
+    margin-bottom: 20px;
+}
+
+.form-group-light label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group-light select,
+.form-group-light textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: 1px solid #cbd5e1;
+    background: #f8fafc;
+    font-size: 14px;
+    color: #334155;
+    transition: all 0.2s ease;
+    outline: none;
+    font-family: inherit;
+}
+
+.form-group-light select:focus,
+.form-group-light textarea:focus {
+    background: #ffffff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.btn-submit-light {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    width: 100%;
+}
+
+.btn-submit-light:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.2);
+}
+
+.btn-submit-light:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Complaints History List */
+.complaints-list-section h3 {
+    font-size: 18px;
+    color: #334155;
+    margin-bottom: 20px;
+    padding-left: 10px;
+    border-left: 4px solid #3b82f6;
+}
+
+.empty-complaints {
+    text-align: center;
+    color: #94a3b8;
+    padding: 30px;
+    background: #f8fafc;
+    border-radius: 12px;
+    font-style: italic;
+}
+
+.complaint-item {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #f1f5f9;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+    transition: all 0.2s;
+}
+
+.complaint-item:hover {
+    border-color: #e2e8f0;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.03);
+    transform: translateY(-2px);
+}
+
+.ci-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: white;
+    flex-shrink: 0;
+}
+
+.ci-content {
+    flex: 1;
+}
+
+.ci-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.ci-top h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.ci-date {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.ci-desc {
+    color: #475569;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.ci-status {
+    font-size: 13px;
+    color: #64748b;
+    padding-top: 10px;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+}
+
+.ci-remark {
+    margin-top: 10px;
+    background: #fffbeb;
+    /* Light yellow for admin note */
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #92400e;
+    border: 1px solid #fef3c7;
+}
+
+
+/* Form Row Styles */
+.form-row-light {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.form-group-light.half {
+    flex: 1;
+}
+
+/* Warning Alert */
+.warning-alert {
+    background: #fff5f5;
+    color: #c53030;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid #feb2b2;
+    margin-bottom: 20px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+
+/* --- Enhanced Complaint Form (Light Design) --- */
+
+/* --- Enhanced Complaint Form (Light Design) --- */
+
+.alert-warning-box {
+    background: #fff3cd;
+    color: #856404;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 20px;
+    border: 1px solid #ffeeba;
+    display: flex;
+    align-items: flex-start;
+    /* Better for multiline text */
+    gap: 10px;
+    line-height: 1.5;
+    word-break: break-word;
+    /* Prevent long text overflow */
+}
+
+.form-row-light {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    /* Allow wrapping on small screens */
+}
+
+.form-group-light.half {
+    flex: 1;
+    min-width: 250px;
+    /* Ensure inputs don't get too small before wrapping */
+}
+
+.file-upload-box {
+    border: 2px dashed #cbd5e1;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    background: #f8fafc;
+    cursor: pointer;
+    transition: all 0.2s;
+    overflow: hidden;
+    /* Prevent filename overflow */
+}
+
+.file-upload-box:hover {
+    border-color: #3b82f6;
+    background: #f1f5f9;
+}
+
+.file-upload-box input[type='file'] {
+    width: 100%;
+}
+
+/* Responsive Adjustments for Complaints */
+@media (max-width: 768px) {
+
+    /* Reset Fixed Layout for Mobile */
+    .student-wrapper {
+        flex-direction: column;
+        height: auto;
+        overflow: visible;
+        width: 100%;
+    }
+
+    .main-content {
+        height: auto;
+        overflow: visible;
+    }
+
+    .sidebar {
+        height: 100vh;
+        /* Sidebar overlay still needs full height */
+    }
+
+    /* Stack form rows */
+    .form-row-light {
+        flex-direction: column;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+
+    .form-group-light.half {
+        flex: auto;
+    }
+
+    /* Adjust padding */
+    .cp-body {
+        padding: 25px;
+        max-height: 60vh;
+        /* restrict height to force internal scroll */
+        overflow-y: auto;
+        scrollbar-width: thin;
+        /* Firefox */
+    }
+
+    /* Complaints List Items */
+    .complaint-item {
+        flex-direction: column;
+        gap: 12px;
+        padding: 15px;
+    }
+
+    .ci-top {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+
+    .ci-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+
+    .ci-content {
+        width: 100%;
+    }
+
+    .ci-status {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+}
+
+.btn-download-qr {
+    margin-top: 15px;
+    background: #FF5722;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    margin-right: auto;
+    transition: transform 0.2s;
+}
+
+.btn-download-qr:hover {
+    transform: scale(1.05);
+    background: #F4511E;
+}
